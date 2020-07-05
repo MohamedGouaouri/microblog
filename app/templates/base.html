@@ -10,38 +10,37 @@
             <title>Microblog</title>
         {% endif %}
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
         {% block style %}
-
+            <link rel="stylesheet" href="../static/halfmoon/css/halfmoon.css">
         {% endblock %}
     {% endblock %}
 
 </head>
 <body>
-    <div>
-        Microblog:
-        <a href="{{ url_for('home') }}">Home</a>
+    <div class="page-wrapper with-navbar">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
+                <ul class="navbar-nav d-none d-md-flex">
+                    {% if current_user.is_anonymous %}
+                        <li class="nav-item"><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+                    {% else %}
+                        <li class="nav-item"><a href="{{ url_for('explore') }}" class="nav-link">Explore</a></li>
+                        <li class="nav-item"><a href="{{ url_for('user', username=current_user.username) }}" class="nav-link">Profile</a></li>
+                        <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></li>
 
-        {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
-        {% else %}
-            <a href="{{ url_for('explore') }}">Explore</a>
-            <a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
-             <a href="{{ url_for('logout') }}">Logout</a>
-
-        {% endif %}
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
 
     </div>
-    {% block contents %}
-        <h3>Hi: {{ current_user.username }}</h3>
-    {% endblock %}
-
-
+        {% block contents %}
+            <h3>Hi: {{ current_user.username }}</h3>
+        {% endblock %}
     {% block js %}
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="../static/halfmoon/js/halfmoon.js"></script>
     {% endblock %}
 </body>
 </html>

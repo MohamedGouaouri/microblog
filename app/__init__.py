@@ -5,12 +5,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_bootstrap import Bootstrap
 
 from .config import Config
 
 app = Flask(__name__)
-bootstrap = Bootstrap(app)
 
 # import configurations from object
 app.config.from_object(Config)
