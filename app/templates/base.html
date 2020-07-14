@@ -35,10 +35,11 @@
             </div>
         </nav>
 
-    </div>
         {% block contents %}
             <h3>Hi: {{ current_user.username }}</h3>
         {% endblock %}
+    </div>
+
     {% block js %}
         <script src="../static/halfmoon/js/halfmoon.js"></script>
     {% endblock %}

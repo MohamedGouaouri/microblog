@@ -1,0 +1,6 @@
+.flaskenv
+tests.py
+app/app.db
+app/config.py
+logs/
+migrations/
