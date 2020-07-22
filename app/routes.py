@@ -41,7 +41,7 @@ def login():
         # check if user authentication is valid
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid user credentials', 'error')
+            flash('Invalid user credentials', 'danger')
             return redirect(url_for('login'))
         # authentication is successful
         login_user(user, remember=form.remember_me.data)
@@ -49,6 +49,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('home')
 
+        flash('Welcome again', 'success')
         return redirect(next_page)
 
     return render_template('login.html', form=form)
@@ -70,12 +71,12 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations you are now a member of our family')
+        flash('Congratulations you are now a member of our family', 'success')
         return redirect(url_for('home'))
     return render_template('register.html', form=form, title='Register')
 
 
-@app.route('/home/<username>')
+@app.route('/home/user/<username>')
 @login_required
 def user(username):
     u = User.query.filter_by(username=username).first_or_404()
@@ -92,7 +93,7 @@ def edit_profile():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
         db.session.commit()
-        flash('Your information have been changed')
+        flash('Your information have been changed', 'success')
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
@@ -106,14 +107,14 @@ def follow(username):
     if form.validate_on_submit():
         user = User.query.filter_by(username=username).first()
         if user is None:
-            flash('User {} not found.'.format(username))
+            flash('User {} not found.'.format(username), 'danger')
             return redirect(url_for('home'))
         if user == current_user:
-            flash('You cannot follow yourself!')
+            flash('You cannot follow yourself!', 'danger')
             return redirect(url_for('user', username=username))
         current_user.follow(user)
         db.session.commit()
-        flash('You are following {}!'.format(username))
+        flash('You are following {}!'.format(username), 'success')
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('home'))
@@ -126,14 +127,14 @@ def unfollow(username):
     if form.validate_on_submit():
         user = User.query.filter_by(username=username).first()
         if user is None:
-            flash('User {} not found.'.format(username))
+            flash('User {} not found.'.format(username), 'danger')
             return redirect(url_for('home'))
         if user == current_user:
-            flash('You cannot unfollow yourself!')
+            flash('You cannot unfollow yourself!', 'danger')
             return redirect(url_for('user', username=username))
         current_user.unfollow(user)
         db.session.commit()
-        flash('You are not following {}.'.format(username))
+        flash('You are not following {}.'.format(username), 'secondary')
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('home'))

@@ -5,6 +5,17 @@
       <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                      <div class="content">
+                          {% for category, message in messages %}
+                              <div class="alert alert-{{category}}">
+                                {{ message }}
+                              </div>
+                          {% endfor %}
+                      </div>
+                {% endif %}
+            {% endwith %}
             <div class="card">
                 <h2 class="card-title">About: {{ user.username }}</h2>
                 {% if user.about_me %}
@@ -20,12 +31,12 @@
                       {% elif not current_user.is_following(user) %}
                           <form action="{{ url_for('follow', username=user.username) }}" method="post">
                               {{ form.hidden_tag() }}
-                              {{ form.submit(value='Follow') }}
+                              {{ form.submit(value='Follow', class_='btn btn-success') }}
                           </form>
                       {% else %}
                       <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
                           {{ form.hidden_tag() }}
-                          {{ form.submit(value='Unfollow') }}
+                          {{ form.submit(value='Unfollow', class_='btn btn-danger') }}
                       </form>
                       {% endif %}
             </div>
@@ -40,12 +51,3 @@
       </div>
     </div>
 {% endblock %}
-
-
-
-
-
-
-
-
-
