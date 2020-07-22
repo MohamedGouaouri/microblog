@@ -21,10 +21,10 @@ def before_request():
 def home():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data)
+        post = Post(body=form.post.data, user_id=current_user.id)
         db.session.add(post)
         db.session.commit()
-        flash('You post is alive!')
+        flash('You post is alive!', 'success')
         return redirect(url_for('home'))
 
     # the user must see followed user posts
@@ -41,7 +41,7 @@ def login():
         # check if user authentication is valid
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid user credentials')
+            flash('Invalid user credentials', 'error')
             return redirect(url_for('login'))
         # authentication is successful
         login_user(user, remember=form.remember_me.data)
@@ -75,13 +75,13 @@ def register():
     return render_template('register.html', form=form, title='Register')
 
 
-@app.route('/home/user/<username>')
+@app.route('/home/<username>')
 @login_required
 def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = user.posts
+    u = User.query.filter_by(username=username).first_or_404()
+    posts = u.posts
     form = EmptyForm()
-    return render_template('user.html', title=username, posts=posts, user=user, form=form)
+    return render_template('user.html', title=username, posts=posts, user=u, form=form)
 
 
 @login_required

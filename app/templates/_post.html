@@ -1,8 +1,10 @@
-<table>
-  <tr valign="top">
 
-  <td>
-    <a href="{{ url_for('user', username=post.author.username) }}"></a> says: <br>{{ post.body }}
-  </td>
-  </tr>
-</table>
+
+<!--<a href="{{ url_for('user', username=post.author.username) }}"></a> says: <br>{{ post.body }}-->
+
+<div class="card">
+  <h2 class="card-title">{{ post.author.username }}</h2>
+  <p>
+    {{ post.body }}
+  </p>
+</div>

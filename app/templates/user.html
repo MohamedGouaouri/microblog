@@ -3,6 +3,7 @@
 
     <div class="container">
       <div class="row">
+          <div class="col-md-3"></div>
           <div class="col-md-6">
             <div class="card">
                 <h2 class="card-title">About: {{ user.username }}</h2>
@@ -28,10 +29,14 @@
                       </form>
                       {% endif %}
             </div>
-            {% for post in posts %}
-              {% include '_post.html' %}
-            {% endfor %}
+
+                <div class="content">
+                    {% for post in posts %}
+                        {% include '_post.html' %}
+                    {% endfor %}
+                </div>
           </div>
+          <div class="col-md-3"></div>
       </div>
     </div>
 {% endblock %}

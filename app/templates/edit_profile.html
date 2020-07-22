@@ -1,26 +1,33 @@
 {% extends "base.html" %}
 {% block contents %}
     <div class="container-fluid">
-        <h1>Edit Profile</h1>
-
-        <form action="" method="post" class="form-inline w-400 mw-full ">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.username.label(class_="w-100")}}
-                {{ form.username(size=32, class_="form-control") }}
-                {% for error in form.username.errors%}
-                    <span style="color: #ff0000">[{{ error }}]</span>
-                {% endfor %}
-            </div>
-            <div class="form-group">
-                {{ form.about_me.label }}
-                {{ form.about_me(cols=50, rows=4, class_="form-control") }}
-                {% for error in form.about_me.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </div>
-                {{ form.submit(class_="btn btn-primary form-control") }}
-        </form>
+        <div class="row">
+            <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <h1>Edit Profile</h1>
+            <form action="" method="post" class="form-inline w-400 mw-full ">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username.label(class_="w-100")}}
+                    {{ form.username(size=32, class_="form-control") }}
+                    {% for error in form.username.errors%}
+                        <span style="color: #ff0000">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.about_me.label }}
+                    {{ form.about_me(cols=50, rows=4, class_="form-control") }}
+                    {% for error in form.about_me.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class_="btn btn-primary form-control") }}
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3"></div>
+        </div>
     </div>
 
 {% endblock %}
