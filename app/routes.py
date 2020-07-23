@@ -145,3 +145,17 @@ def unfollow(username):
 def explore():
     posts = Post.query.order_by(Post.timestamp.desc()).all()
     return render_template('index.html', title='Explore', posts=posts)
+
+
+
+# Begin of my modifications
+@app.route('/home/post/delete/<id>')
+@login_required
+def delete_post(id):
+    post = Post.query.get(id)
+    if post:
+        db.session.delete(post)
+        db.session.commit()
+        flash('Your post is deleted', 'success')
+    return redirect(url_for('home'))
+# End of my modifications

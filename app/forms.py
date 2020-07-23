@@ -52,3 +52,6 @@ class EmptyForm(FlaskForm):
 class PostForm(FlaskForm):
     post = TextAreaField('Post area', validators=[DataRequired(), Length(min=1, max=140)])
     submit = SubmitField('Submit')
+
+class DeletePostForm(FlaskForm):
+    submit = SubmitField('Submit')

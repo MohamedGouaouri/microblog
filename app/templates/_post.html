@@ -10,4 +10,12 @@
   <p>
     {{ post.body }}
   </p>
+  {% if post.author == current_user %}
+    <div class="d-flex flex-row">
+      <div class="ml-auto">
+        <button class="btn btn-secondary">Edit</button>
+        <button class="btn btn-danger"><a href="{{ url_for('delete_post', id=post.id) }}" style="text-transform:none">Delete</a></button>
+      </div>
+    </div>
+  {% endif %}
 </div>
