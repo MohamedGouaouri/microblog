@@ -46,6 +46,18 @@
                         {% include '_post.html' %}
                     {% endfor %}
                 </div>
+                <div class="row">
+               
+                  <div class="ml-auto  mr-auto">
+                      {% if next_url %}
+                          <a href="{{ next_url }}">Next >> </a>
+                      {% endif %}
+                      {% if prev_url %}
+                          <a href="{{ prev_url }}"><< Prev</a>
+                      {% endif %}
+                  </div>
+                
+                </div>
           </div>
           <div class="col-md-3"></div>
       </div>
