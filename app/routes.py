@@ -95,8 +95,9 @@ def user(username):
         )
     next_url = url_for('user', username=u.username, page=posts.next_num) if posts.has_next else None
     prev_url = url_for('user', username=u.username, page=posts.prev_num) if posts.has_prev else None
+    form = EmptyForm()
     return render_template('user.html', title=username, posts=posts.items, user=u,
-            next_url=next_url, prev_url=prev_url
+            next_url=next_url, prev_url=prev_url, form=form
         )
 
 
