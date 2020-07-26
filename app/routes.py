@@ -3,7 +3,11 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from . import app
 from app import db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm
+from app.forms import (LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm,
+    ResetPasswordRequestForm, ResetPasswordForm
+)
+from app.email import send_password_reset_email
+
 from app.models import User, Post
 from datetime import datetime
 
@@ -35,7 +39,7 @@ def home():
     )
     next_url = url_for('home', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('home', page=posts.prev_num) if posts.has_prev else None
-    return render_template('index.html', title="Microblog", posts=posts.items, form=form, 
+    return render_template('index.html', title="Microblog", posts=posts.items, form=form,
                             next_url=next_url, prev_url=prev_url
             )
 
@@ -171,6 +175,49 @@ def explore():
             next_url=next_url, prev_url=prev_url
         )
 
+
+
+# reset Password request
+@app.route('/home/reset_password', methods=['POST', 'GET'])
+def reset_password_request():
+    """
+        docs: 
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    # create reset password form
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        # fetch user from database
+        u = User.query.filter_by(email=form.email.data).first()
+        if u:
+            # user exists
+            send_password_reset_email(u)
+        flash('Check your email for the instructions to reset your password', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_password_request.html', form=form, title='Reset password')
+
+
+# make function to reset password
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    user = User.verify_reset_password_token(toke)
+    if not user:
+        # no such user in our database
+        flash('No such user in our database', 'error')
+        return redirect(url_for('home'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        # commit changes in db
+        db.session.commit()
+        flash('Your password has been reset', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', form=form)
 
 # Begin of my modifications
 @app.route('/home/post/delete/<id>')
