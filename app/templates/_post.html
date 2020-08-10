@@ -1,22 +1,30 @@
-
-
-<!--<a href="{{ url_for('user', username=post.author.username) }}"></a> says: <br>{{ post.body }}-->
-
-<div class="card">
-  <div class="d-flex flex-row">
-    <a href="{{ url_for('user', username=post.author.username) }}"><img src="{{post.author.avatar(100)}}" alt="" class="img-fluid rounded-circle" width="25" height="25"></a>
-    <h2 class="card-title ml-2">{{ post.author.username }}</h2>
-    <p class="ml-auto">Posted at {{ moment(post.timestamp).fromNow() }}</p>
-  </div>
-  <p>
-    {{ post.body }}
-  </p>
-  {% if post.author == current_user %}
-    <div class="d-flex flex-row">
-      <div class="ml-auto">
-        <button class="btn btn-secondary">Edit</button>
-        <button class="btn btn-danger"><a href="{{ url_for('delete_post', id=post.id) }}" style="text-transform:none">Delete</a></button>
-      </div>
-    </div>
-  {% endif %}
-</div>
+    <table class="table table-hover">
+        <tr>
+            <td width="70px">
+                <a href="{{ url_for('main.user', username=post.author.username) }}">
+                    <img src="{{ post.author.avatar(70) }}" />
+                </a>
+            </td>
+            <td>
+                {% set user_link %}
+                    <a href="{{ url_for('main.user', username=post.author.username) }}">
+                        {{ post.author.username }}
+                    </a>
+                {% endset %}
+                {{ _('%(username)s said %(when)s',
+                    username=user_link, when=moment(post.timestamp).fromNow()) }}
+                <br>
+                <span id="post{{ post.id }}">{{ post.body }}</span>
+                {% if post.language and post.language != g.locale %}
+                <br><br>
+                <span id="translation{{ post.id }}">
+                    <a href="javascript:translate(
+                                '#post{{ post.id }}',
+                                '#translation{{ post.id }}',
+                                '{{ post.language }}',
+                                '{{ g.locale }}');">{{ _('Translate') }}</a>
+                </span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>

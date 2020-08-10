@@ -1,23 +1,18 @@
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import db, login, app
-from app import login
 from datetime import datetime
 from hashlib import md5
 from time import time
+from flask import current_app
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+from app import db, login
 
 
-@login.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
-# Modeling followers and following users
-followers = db.Table("followers",
-                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')),
-                     )
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+)
 
 
 class User(UserMixin, db.Model):
@@ -34,20 +29,19 @@ class User(UserMixin, db.Model):
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # We will use Gravatar service
     def avatar(self, size):
-        # hash the email
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
-        return "https://www.gravatar.com/avatar/{}?d=identicon&s={}".format(digest, size)
-
-    def is_following(self, other):
-        return self.followed.filter(followers.c.followed_id == other.id).count() > 0
+        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
+            digest, size)
 
     def follow(self, user):
         if not self.is_following(user):
@@ -57,29 +51,36 @@ class User(UserMixin, db.Model):
         if self.is_following(user):
             self.followed.remove(user)
 
+    def is_following(self, user):
+        return self.followed.filter(
+            followers.c.followed_id == user.id).count() > 0
+
     def followed_posts(self):
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
-            followers.c.follower_id == self.id)
+                followers.c.follower_id == self.id)
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own).order_by(Post.timestamp.desc())
 
-    def __repr__(self):
-        return "<User {}>".format(self.username)
-
-
     def get_reset_password_token(self, expires_in=600):
-        payload = {'reset_password': self.id, 'exp': time() + expires_in}
-        return jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            user_id = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
         except:
-            return 
-        return User.query.get(user_id)
+            return
+        return User.query.get(id)
 
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 class Post(db.Model):
@@ -87,6 +88,7 @@ class Post(db.Model):
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    language = db.Column(db.String(5))
 
     def __repr__(self):
-        return "<Post {}>".format(self.body)
+        return '<Post {}>'.format(self.body)

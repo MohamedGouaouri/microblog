@@ -1,56 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% block head %}
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        {% if title %}
-            <title>{{ title }}</title>
-        {% else %}
-            <title>Microblog</title>
-        {% endif %}
+{% extends 'bootstrap/base.html' %}
 
+{% block title %}
+    {% if title %}{{ title }} - Microblog{% else %}{{ _('Welcome to Microblog') }}{% endif %}
+{% endblock %}
 
-        {% block style %}
-            <link rel="stylesheet" href="/static/halfmoon/css/halfmoon.css">
-            <link rel="stylesheet" href="/static/fa/css/font-awesome.css">
-        {% endblock %}
-    {% endblock %}
-
-</head>
-<body>
-    <div class="page-wrapper with-navbar">
-        <nav class="navbar">
-            <div class="navbar-content">
-                <a href="{{ url_for('home') }}" class="navbar-brand">Home</a>
-                <ul class="navbar-nav d-none d-md-flex">
+{% block navbar %}
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">Microblog</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="{{ url_for('main.index') }}">{{ _('Home') }}</a></li>
+                    <li><a href="{{ url_for('main.explore') }}">{{ _('Explore') }}</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
-                        <li class="nav-item"><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">{{ _('Login') }}</a></li>
                     {% else %}
-                        <li class="nav-item"><a href="{{ url_for('explore') }}" class="nav-link">Explore</a></li>
-                        <li class="nav-item"><a href="{{ url_for('user', username=current_user.username) }}" class="nav-link">Profile</a></li>
-                        <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link">Logout</a></li>
+                    <li><a href="{{ url_for('main.user', username=current_user.username) }}">{{ _('Profile') }}</a></li>
+                    <li><a href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a></li>
                     {% endif %}
-
                 </ul>
             </div>
-            <div class="navbar-content ml-auto">
-                <li class="nav-item"><button class="btn btn-primary" type="button" onclick="halfmoon.toggleDarkMode()"><i class="fa fa-moon-o" aria-hidden="true"></i></button></li>
-            </div>
-        </nav>
+        </div>
+    </nav>
+{% endblock %}
 
-         <div class="content-wrapper">
-            {% block contents %}
-                
-            {% endblock %}
-         </div>
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {# application content needs to be provided in the app_content block #}
+        {% block app_content %}{% endblock %}
     </div>
+{% endblock %}
 
-
-
-    {% block js %}
-        <script src="/static/halfmoon/js/halfmoon.js"></script>
-        <script src="/static/js/moment.js"></script>
-    {% endblock %}
-</body>
-</html>
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
+    {{ moment.lang(g.locale) }}
+    <script>
+        function translate(sourceElem, destElem, sourceLang, destLang) {
+            $(destElem).html('<img src="{{ url_for('static', filename='loading.gif') }}">');
+            $.post('/translate', {
+                text: $(sourceElem).text(),
+                source_language: sourceLang,
+                dest_language: destLang
+            }).done(function(response) {
+                $(destElem).text(response['text'])
+            }).fail(function() {
+                $(destElem).text("{{ _('Error: Could not contact server.') }}");
+            });
+        }
+    </script>
+{% endblock %}
