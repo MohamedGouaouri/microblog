@@ -1,67 +1,27 @@
 {% extends "base.html" %}
-{% block contents%}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-    <div class="container-fluid">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-6">
-                    {% if messages %}
-                        <div class="content">
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{category}}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-md-3"></div>
-            </div>
-        {% endwith %}
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-6">
-                {% if form %}
-                    <form action="" method="post">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group">
-                            {{ form.post.label }}
-                            {{ form.post(cols=32, rows=4, class_="form-control") }}
-                            {% for error in form.post.errors%}
-                                <span style="color: red">[{{ error }}]</span>
-                            {% endfor %}
-                        </div>
-                        {{ form.submit(class_="form-control btn btn-primary") }}
-                    </form>
-                {% endif %}
-            </div>
-            <div class="col-md-3"></div>
-        </div>
-
-        {% if posts %}
-            <div class="row">
-                <div class="col-md-3"></div>
-                <div class="col-md-6">
-                    {% for post in posts %}
-                        {% include '_post.html' %}
-                    {% endfor %}
-                </div>
-                <div class="col-md-3"></div>
-            </div>
-
-            <div class="row">
-               
-                <div class="ml-auto  mr-auto">
-                    {% if next_url %}
-                        <a href="{{ next_url }}">Next >> </a>
-                    {% endif %}
-                    {% if prev_url %}
-                        <a href="{{ prev_url }}"><< Prev</a>
-                    {% endif %}
-                </div>
-                
-            </div>
-        {% endif %}
-    </div>
+{% block app_content %}
+    <h1>{{ _('Hi, %(username)s!', username=current_user.username) }}</h1>
+    {% if form %}
+    {{ wtf.quick_form(form) }}
+    <br>
+    {% endif %}
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> {{ _('Newer posts') }}
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    {{ _('Older posts') }} <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}
